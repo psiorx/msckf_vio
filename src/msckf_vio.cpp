@@ -503,22 +503,7 @@ void MsckfVio::mocapOdomCallback(
 
   tf::poseEigenToMsg(T_b_w_gt, mocap_odom_msg.pose.pose);
   //tf::vectorEigenToMsg(body_velocity_gt,
-  //    mocap_odom_msg.twist.twist.linear);
-
-  // Publish pose
-  geometry_msgs::PoseStamped pose_msg;
-  pose_msg.header.stamp = mocap_odom_msg.header.stamp;
-  pose_msg.header.frame_id = mocap_odom_msg.header.frame_id;
-  pose_msg.pose = mocap_odom_msg.pose.pose;
-  pose_pub.publish(pose_msg);
-
-
-  // Publish twist
-  geometry_msgs::TwistStamped twist_msg;
-  twist_msg.header.stamp = mocap_odom_msg.header.stamp;
-  twist_msg.header.frame_id = mocap_odom_msg.header.frame_id;
-  twist_msg.twist = mocap_odom_msg.twist.twist;
-  twist_pub.publish(twist_msg);
+  //mocap_odom_msg.twist.twist.linear);  
 
   mocap_odom_pub.publish(mocap_odom_msg);
   return;
@@ -1437,6 +1422,20 @@ void MsckfVio::publish(const ros::Time& time) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)
       odom_msg.twist.covariance[i*6+j] = P_body_vel(i, j);
+  
+  // Publish pose
+  geometry_msgs::PoseStamped pose_msg;
+  pose_msg.header.stamp = odom_msg.header.stamp;
+  pose_msg.header.frame_id = odom_msg.header.frame_id;
+  pose_msg.pose = odom_msg.pose.pose;
+  pose_pub.publish(pose_msg);
+
+  // Publish twist
+  geometry_msgs::TwistStamped twist_msg;
+  twist_msg.header.stamp = odom_msg.header.stamp;
+  twist_msg.header.frame_id = odom_msg.header.frame_id;
+  twist_msg.twist = odom_msg.twist.twist;
+  twist_pub.publish(twist_msg);
 
   odom_pub.publish(odom_msg);
 
