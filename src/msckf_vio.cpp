@@ -178,6 +178,10 @@ bool MsckfVio::loadParameters() {
 
 bool MsckfVio::createRosIO() {
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 10);
+  
+  pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 10);
+  twist_pub = nh.advertise<geometry_msgs::TwistStamped>("twist", 10);
+  
   feature_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "feature_point_cloud", 10);
 
@@ -500,6 +504,21 @@ void MsckfVio::mocapOdomCallback(
   tf::poseEigenToMsg(T_b_w_gt, mocap_odom_msg.pose.pose);
   //tf::vectorEigenToMsg(body_velocity_gt,
   //    mocap_odom_msg.twist.twist.linear);
+
+  // Publish pose
+  geometry_msgs::PoseStamped pose_msg;
+  pose_msg.header.stamp = mocap_odom_msg.header.stamp;
+  pose_msg.header.frame_id = mocap_odom_msg.header.frame_id;
+  pose_msg.pose = mocap_odom_msg.pose.pose;
+  pose_pub.publish(pose_msg);
+
+
+  // Publish twist
+  geometry_msgs::TwistStamped twist_msg;
+  twist_msg.header.stamp = mocap_odom_msg.header.stamp;
+  twist_msg.header.frame_id = mocap_odom_msg.header.frame_id;
+  twist_msg.twist = mocap_odom_msg.twist.twist;
+  twist_pub.publish(twist_msg);
 
   mocap_odom_pub.publish(mocap_odom_msg);
   return;
